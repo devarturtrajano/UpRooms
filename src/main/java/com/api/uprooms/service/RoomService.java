@@ -19,7 +19,7 @@ public class RoomService {
     @Transactional
     public RoomDTO createRoom(RoomDTO dto) {
         if (roomRepository.existsByNumber(dto.number())) {
-            throw new IllegalArgumentException("Já existe uma sala cadastrada com o número " + dto.number());
+            throw new IllegalArgumentException("Already exists a room with number: " + dto.number());
         }
 
         Room room = new Room();
@@ -40,7 +40,7 @@ public class RoomService {
 
     public Room findEntityById(Long id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada com ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Room not found with ID: " + id));
     }
 
     @Transactional

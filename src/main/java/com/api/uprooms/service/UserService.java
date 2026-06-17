@@ -20,7 +20,7 @@ public class UserService {
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("Este e-mail já está em uso.");
+            throw new IllegalArgumentException("This email is already registered.");
         }
 
         User user = new User();
@@ -35,7 +35,7 @@ public class UserService {
 
     public User findEntityById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
     }
 
     public List<UserResponseDTO> findAll() {

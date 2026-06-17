@@ -27,14 +27,14 @@ public class BookingService {
     @Transactional
     public BookingResponseDTO createBooking(BookingRequestDTO dto) {
         if (dto.startTime().isAfter(dto.endTime()) || dto.startTime().isEqual(dto.endTime())) {
-            throw new IllegalArgumentException("A data de início deve ser anterior à data de término.");
+            throw new IllegalArgumentException("The start time must be before the end time.");
         }
 
         User user = userService.findEntityById(dto.userId());
         Room room = roomService.findEntityById(dto.roomId());
 
         if (!room.isActive()) {
-            throw new IllegalStateException("Esta sala está inativa ou em manutenção.");
+            throw new IllegalStateException("This room is not active or in maintenance.");
         }
 
         boolean isOverlapping = bookingRepository.existsOverlappingBooking(
@@ -45,7 +45,7 @@ public class BookingService {
         );
 
         if (isOverlapping) {
-            throw new IllegalStateException("A sala já possui uma reserva confirmada para este horário.");
+            throw new IllegalStateException("This room is already booked during this time.");
         }
 
         Booking booking = new Booking();
@@ -62,14 +62,14 @@ public class BookingService {
     @Transactional
     public void cancelBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new IllegalArgumentException("Reserva não encontrada."));
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
         booking.setStatus(EnumBookingStatus.BookingStatus.CANCELED);
         bookingRepository.save(booking);
     }
 
     public List<BookingResponseDTO> findBookingsByUserId(Long userId) {
-        return bookingRepository.findByUserId(userId)
+        return bookingRepository.findByUserIdFetchAll(userId)
                 .stream()
                 .map(BookingResponseDTO::new)
                 .toList();
