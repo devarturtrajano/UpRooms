@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UproomsApplication {
 
 	public static void main(String[] args) {
-		// Carrega as variáveis de ambiente a partir do teu ficheiro data.env na raiz do projeto
 		Dotenv dotenv = Dotenv.configure()
 				.filename("data.env")
 				.ignoreIfMissing()

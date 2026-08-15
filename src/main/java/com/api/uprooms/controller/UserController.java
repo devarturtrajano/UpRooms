@@ -31,9 +31,15 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> users = userService.findAll();
-        return ResponseEntity.ok(users);
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getAllUsers(@PathVariable Long userId) {
+        try {
+            List<UserResponseDTO> users = userService.findAll(userId);
+            return ResponseEntity.ok(users);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body("Only admins can perform this action.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("User not found with ID: " + userId);
+        }
     }
 }

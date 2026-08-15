@@ -3,6 +3,7 @@ package com.api.uprooms.service;
 import com.api.uprooms.dto.UserRequestDTO;
 import com.api.uprooms.dto.UserResponseDTO;
 import com.api.uprooms.model.User;
+import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,15 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
     }
 
-    public List<UserResponseDTO> findAll() {
+    public List<UserResponseDTO> findAll(Long userId) {
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        if (user.getRole() != EnumUserRole.UserRole.ADMIN) {
+            throw new SecurityException("Only admins can perform this action.");
+        }
+
         return userRepository.findAll()
                 .stream()
                 .map(UserResponseDTO::new)

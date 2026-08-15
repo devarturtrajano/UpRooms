@@ -45,7 +45,7 @@ public class BookingService {
         );
 
         if (isOverlapping) {
-            throw new IllegalStateException("This room is already booked during this time.");
+            throw new IllegalArgumentException("This room is already booked during this time.");
         }
 
         Booking booking = new Booking();
@@ -69,9 +69,13 @@ public class BookingService {
     }
 
     public List<BookingResponseDTO> findBookingsByUserId(Long userId) {
-        return bookingRepository.findByUserIdFetchAll(userId)
-                .stream()
-                .map(BookingResponseDTO::new)
-                .toList();
+        try {
+            return bookingRepository.findByUserIdFetchAll(userId)
+                    .stream()
+                    .map(BookingResponseDTO::new)
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("User not found with ID: " + userId);
+        }
     }
 }

@@ -21,25 +21,39 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO dto) {
-        BookingResponseDTO response = bookingService.createBooking(dto);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
+    public ResponseEntity<Object> createBooking(@Valid @RequestBody BookingRequestDTO dto) {
+        try {
+            BookingResponseDTO response = bookingService.createBooking(dto);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(response.id())
+                    .toUri();
 
-        return ResponseEntity.created(location).body(response);
+            return ResponseEntity.created(location).body(response);
+        } catch (IllegalStateException e){
+            return ResponseEntity.badRequest().body("This room is not active or in maintenance.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("This room is already booked during this time.");
+        }
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<List<BookingResponseDTO>> getUserBookings(@PathVariable Long userId) {
-        List<BookingResponseDTO> bookings = bookingService.findBookingsByUserId(userId);
-        return ResponseEntity.ok(bookings);
+    public ResponseEntity<Object> getUserBookings(@PathVariable Long userId) {
+        try {
+            List<BookingResponseDTO> bookings = bookingService.findBookingsByUserId(userId);
+            return ResponseEntity.ok(bookings);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("User not found with ID: " + userId);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long id) {
-        bookingService.cancelBooking(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> cancelBooking(@PathVariable Long id) {
+        try {
+            bookingService.cancelBooking(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("Booking not found.");
+        }
     }
 }
