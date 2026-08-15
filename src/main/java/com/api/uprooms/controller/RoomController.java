@@ -1,13 +1,10 @@
 package com.api.uprooms.controller;
 
 import com.api.uprooms.dto.RoomDTO;
-import com.api.uprooms.dto.UserRequestDTO;
-import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.service.RoomService;
 import com.api.uprooms.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
