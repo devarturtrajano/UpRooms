@@ -5,18 +5,31 @@ import com.api.uprooms.dto.UserResponseDTO;
 import com.api.uprooms.model.User;
 import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
 
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
@@ -28,7 +41,7 @@ public class UserService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setRole(dto.role());
-        user.setPassword(dto.password());
+        user.setPassword(passwordEncoder.encode(dto.password()));
 
         user = userRepository.save(user);
         return new UserResponseDTO(user);
