@@ -3,7 +3,6 @@ package com.api.uprooms.service;
 import com.api.uprooms.dto.UserRequestDTO;
 import com.api.uprooms.dto.UserResponseDTO;
 import com.api.uprooms.model.User;
-import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
