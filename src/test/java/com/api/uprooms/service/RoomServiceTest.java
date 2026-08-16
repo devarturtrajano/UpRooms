@@ -50,10 +50,9 @@ public class RoomServiceTest {
         Room savedRoom = sampleRoom;
 
         Mockito.when(mockRoomRepository.existsByNumber(roomDTO.number())).thenReturn(false);
-        Mockito.when(mockUserRepository.findById(sampleAdminUser.getId())).thenReturn(java.util.Optional.of(sampleAdminUser));
         Mockito.when(mockRoomRepository.save(Mockito.any(Room.class))).thenReturn(savedRoom);
 
-        RoomDTO result = mockRoomService.createRoom(roomDTO, sampleAdminUser.getId());
+        RoomDTO result = mockRoomService.createRoom(roomDTO);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(roomDTO.number(), result.number());
@@ -69,26 +68,8 @@ public class RoomServiceTest {
     void should_return_illegal_argument_exception_when_a_user_tries_to_create_a_room_which_number_already_exists(){
         Mockito.when(mockRoomRepository.existsByNumber(roomDTO.number())).thenReturn(true);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.createRoom(roomDTO, sampleAdminUser.getId()));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.createRoom(roomDTO));
         Mockito.verify(mockRoomRepository, Mockito.times(1)).existsByNumber(roomDTO.number());
-    }
-
-    @Test
-    @DisplayName("Should return a Illegal State exception when there is a attempt to create a room with a not found user")
-    void should_return_illegal_state_exception_when_there_is_a_attempt_to_create_a_room_with_a_not_found_user(){
-        Mockito.when(mockUserRepository.findById(sampleAdminUser.getId())).thenReturn(java.util.Optional.empty());
-
-        Assertions.assertThrows(IllegalStateException.class, () -> mockRoomService.createRoom(roomDTO, sampleAdminUser.getId()));
-        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleAdminUser.getId());
-    }
-
-    @Test
-    @DisplayName("Should return a Security exception when there is a attempt to create a room with a non admin user")
-    void should_return_illegal_state_exception_when_there_is_a_attempt_to_create_a_room_with_a_not_admin_user(){
-        Mockito.when(mockUserRepository.findById(sampleUser.getId())).thenReturn(java.util.Optional.of(sampleUser));
-
-        Assertions.assertThrows(SecurityException.class, () -> mockRoomService.createRoom(roomDTO, sampleUser.getId()));
-        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleUser.getId());
     }
 
     @Test
@@ -131,11 +112,10 @@ public class RoomServiceTest {
     @Test
     @DisplayName("Should toggle a room status successfully")
     void should_toggle_room_status_successfully(){
-        Mockito.when(mockUserRepository.findById(sampleAdminUser.getId())).thenReturn(java.util.Optional.of(sampleAdminUser));
         Mockito.when(mockRoomRepository.findById(sampleRoom.getId())).thenReturn(java.util.Optional.of(sampleRoom));
         Mockito.when(mockRoomRepository.save(sampleRoom)).thenReturn(sampleRoom);
 
-        mockRoomService.toggleRoomStatus(sampleAdminUser.getId(), sampleRoom.getId());
+        mockRoomService.toggleRoomStatus(sampleRoom.getId());
         Assertions.assertFalse(sampleRoom.isActive());
         Mockito.verify(mockRoomRepository, Mockito.times(1)).save(sampleRoom);
     }
@@ -143,19 +123,10 @@ public class RoomServiceTest {
     @Test
     @DisplayName("Should return a Illegal Argument exception when a user tries to toggle a room status which does not exists")
     void should_return_illegal_argument_exception_when_a_user_tries_to_toggle_a_room_status_which_does_not_exists(){
-        Mockito.when(mockUserRepository.findById(sampleAdminUser.getId())).thenReturn(java.util.Optional.of(sampleAdminUser));
         Mockito.when(mockRoomRepository.findById(sampleRoom.getId())).thenReturn(java.util.Optional.empty());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.toggleRoomStatus(sampleAdminUser.getId(), sampleRoom.getId()));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.toggleRoomStatus(sampleRoom.getId()));
         Mockito.verify(mockRoomRepository, Mockito.times(1)).findById(sampleRoom.getId());
     }
 
-    @Test
-    @DisplayName("Should return a Security exception when a non admin user tries to toggle a room status")
-    void should_return_security_exception_when_a_non_admin_user_tries_to_toggle_a_room_status(){
-        Mockito.when(mockUserRepository.findById(sampleUser.getId())).thenReturn(java.util.Optional.of(sampleUser));
-
-        Assertions.assertThrows(SecurityException.class, () -> mockRoomService.toggleRoomStatus(sampleUser.getId(), sampleRoom.getId()));
-        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleUser.getId());
-    }
 }

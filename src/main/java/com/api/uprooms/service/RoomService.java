@@ -21,16 +21,9 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomDTO createRoom(RoomDTO dto, Long userId) {
+    public RoomDTO createRoom(RoomDTO dto) {
         if (roomRepository.existsByNumber(dto.number())) {
             throw new IllegalArgumentException("Already exists a room with number: " + dto.number());
-        }
-
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
-
-        if (user.getRole() != EnumUserRole.UserRole.ADMIN) {
-            throw new SecurityException("Only admins can perform this action.");
         }
 
         Room room = new Room();
@@ -55,13 +48,7 @@ public class RoomService {
     }
 
     @Transactional
-    public void toggleRoomStatus(Long userId, Long id) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-
-        if (user.getRole() != EnumUserRole.UserRole.ADMIN) {
-            throw new SecurityException("Only admins can perform this action.");
-        }
+    public void toggleRoomStatus(Long id) {
 
         Room room = findEntityById(id);
         room.setActive(!room.isActive());

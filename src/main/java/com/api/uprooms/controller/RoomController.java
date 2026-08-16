@@ -22,24 +22,15 @@ public class RoomController {
         this.userService = userService;
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<Object> createRoom(@Valid @RequestBody RoomDTO dto, @PathVariable Long userId) {
-        try {
-            RoomDTO response = roomService.createRoom(dto, userId);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(response.id())
-                    .toUri();
+    @PostMapping
+    public ResponseEntity<Object> createRoom(@Valid @RequestBody RoomDTO dto) {
+        RoomDTO response = roomService.createRoom(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
 
-            return ResponseEntity.created(location).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("A room with the same number already exists.");
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body("Only admins can perform this action.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("An error occurred while creating the room.");
-        }
-
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/active")
@@ -48,15 +39,9 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
-    @PatchMapping("/{userId}/{id}/toggle-status")
-    public ResponseEntity<Object> toggleRoomStatus(@PathVariable Long userId, @PathVariable Long id) {
-        try {
-            roomService.toggleRoomStatus(userId, id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("User not found with ID:" + userId);
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body("Only admins can perform this action.");
-        }
+    @PatchMapping("{id}/toggle-status")
+    public ResponseEntity<Object> toggleRoomStatus(@PathVariable Long id) {
+        roomService.toggleRoomStatus( id);
+        return ResponseEntity.noContent().build();
     }
 }

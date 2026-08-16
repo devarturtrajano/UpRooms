@@ -44,12 +44,10 @@ class RoomControllerTest {
     void createRoom_WithValidData_ReturnsCreated() throws Exception {
         RoomDTO requestDto = new RoomDTO(null, 101, 10, true);
         RoomDTO responseDto = new RoomDTO(1L, 101, 10, true);
-        User adminUser = new User(1L, "Admin", "admin@email.com", "password", EnumUserRole.UserRole.ADMIN, List.of());
 
-        Mockito.when(userService.findEntityById(1L)).thenReturn(adminUser);
-        Mockito.when(roomService.createRoom(any(RoomDTO.class), eq(adminUser.getId()))).thenReturn(responseDto);
+        Mockito.when(roomService.createRoom(any(RoomDTO.class))).thenReturn(responseDto);
 
-        mockMvc.perform(post("/api/v1/rooms/1")
+        mockMvc.perform(post("/api/v1/rooms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
@@ -60,29 +58,11 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 403 Forbidden when non-ADMIN user tries to create a room")
-    void createRoom_WithNonAdminUser_ReturnsForbidden() throws Exception {
-        RoomDTO requestDto = new RoomDTO(null, 101, 10, true);
-
-        Mockito.when(roomService.createRoom(any(RoomDTO.class), eq(2L)))
-                .thenThrow(new SecurityException("Only admins can perform this action."));
-
-        mockMvc.perform(post("/api/v1/rooms/2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().is(403));
-        Mockito.verify(roomService, Mockito.times(1)).createRoom(any(RoomDTO.class), eq(2L));
-    }
-
-    @Test
     @DisplayName("Should return 400 Bad Request when room capacity is less than 1")
     void createRoom_WithInvalidCapacity_ReturnsBadRequest() throws Exception {
         RoomDTO invalidRequest = new RoomDTO(1L, 102, 0, true);
-        User adminUser = new User(1L, "Admin", "admin@email.com", "password", EnumUserRole.UserRole.ADMIN, List.of());
 
-        Mockito.when(userService.findEntityById(1L)).thenReturn(adminUser);
-
-        mockMvc.perform(post("/api/v1/rooms/1")
+        mockMvc.perform(post("/api/v1/rooms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -110,13 +90,12 @@ class RoomControllerTest {
     @DisplayName("Should toggle room status and return 204 No Content")
     void toggleRoomStatus_ReturnsNoContent() throws Exception {
         Long roomId = 1L;
-        Long userId = 1L;
-        Mockito.doNothing().when(roomService).toggleRoomStatus(userId, roomId);
+        Mockito.doNothing().when(roomService).toggleRoomStatus(roomId);
 
-        mockMvc.perform(patch("/api/v1/rooms/{userId}/{id}/toggle-status", userId, roomId)
+        mockMvc.perform(patch("/api/v1/rooms/{id}/toggle-status", roomId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(roomService, Mockito.times(1)).toggleRoomStatus(userId, roomId);
+        Mockito.verify(roomService, Mockito.times(1)).toggleRoomStatus(roomId);
     }
 }
