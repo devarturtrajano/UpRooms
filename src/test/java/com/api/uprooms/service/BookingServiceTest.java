@@ -74,8 +74,8 @@ class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException when a booking time conflict occurs")
-    void createBooking_WithTimeConflict_ThrowsIllegalStateException() {
+    @DisplayName("Should throw IllegalArgumentException when a booking time conflict occurs")
+    void createBooking_WithTimeConflict_ThrowsIllegalArgumentException() {
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(14).withMinute(0);
         LocalDateTime end = start.plusHours(2);
         BookingRequestDTO requestDto = new BookingRequestDTO(1L, 2L, start, end);
@@ -87,7 +87,7 @@ class BookingServiceTest {
                 eq(2L), eq(start), eq(end), eq(EnumBookingStatus.BookingStatus.CONFIRMED)
         )).thenReturn(true);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.createBooking(requestDto);
         });
 
