@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 
@@ -22,6 +23,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository mockUserRepository;
+
+    @Mock
+    private PasswordEncoder mockPasswordEncoder;
 
     @InjectMocks
     private UserService mockUserService;
@@ -40,6 +44,7 @@ public class UserServiceTest {
     void Should_Create_User_Successfully() {
         UserRequestDTO userRequestDTO = new UserRequestDTO(sampleUser.getName(), sampleUser.getEmail(), sampleUser.getPassword(), sampleUser.getRole());
 
+        Mockito.when(mockPasswordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
         Mockito.when(mockUserRepository.save(Mockito.any(User.class))).thenReturn(sampleUser);
 
         UserResponseDTO response = mockUserService.createUser(userRequestDTO);
@@ -85,33 +90,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("Should return a list of users")
     void Should_Return_List_Of_Users() {
-        Mockito.when(mockUserRepository.findById(sampleAdminUser.getId())).thenReturn(java.util.Optional.of(sampleAdminUser));
         Mockito.when(mockUserRepository.findAll()).thenReturn(java.util.List.of(sampleAdminUser));
 
-        java.util.List<UserResponseDTO> response = mockUserService.findAll(sampleAdminUser.getId());
+        java.util.List<UserResponseDTO> response = mockUserService.findAll();
 
         Assertions.assertEquals(1, response.size());
-        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleAdminUser.getId());
         Mockito.verify(mockUserRepository, Mockito.times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Should return Illegal Argument Exception when tries to find all users on a not found user parameter.")
-    void Should_Return_Illegal_Argument_Exception_When_Tries_To_Find_All_Users_On_Not_Found_User_Parameter() {
-        Mockito.when(mockUserRepository.findById(sampleUser.getId())).thenReturn(java.util.Optional.empty());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockUserService.findAll(sampleUser.getId()));
-        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleUser.getId());
-        Mockito.verify(mockUserRepository, Mockito.never()).findAll();
-    }
-
-    @Test
-    @DisplayName("Should Return Security exception when a non admin user tries to find all user registered")
-    void Should_Return_Security_Exception_When_A_Non_Admin_User_Tries_To_Find_All_User_Registered() {
-        Mockito.when(mockUserRepository.findById(sampleUser.getId())).thenReturn(java.util.Optional.of(sampleUser));
-
-        Assertions.assertThrows(SecurityException.class, () -> mockUserService.findAll(sampleUser.getId()));
-
     }
 
 

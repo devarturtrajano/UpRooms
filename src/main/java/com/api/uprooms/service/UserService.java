@@ -52,15 +52,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
     }
 
-    public List<UserResponseDTO> findAll(Long userId) {
-
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-
-        if (user.getRole() != EnumUserRole.UserRole.ADMIN) {
-            throw new SecurityException("Only admins can perform this action.");
-        }
-
+    public List<UserResponseDTO> findAll() {
         return userRepository.findAll()
                 .stream()
                 .map(UserResponseDTO::new)
