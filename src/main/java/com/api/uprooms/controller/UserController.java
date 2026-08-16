@@ -2,6 +2,7 @@ package com.api.uprooms.controller;
 
 import com.api.uprooms.dto.UserRequestDTO;
 import com.api.uprooms.dto.UserResponseDTO;
+import com.api.uprooms.model.User;
 import com.api.uprooms.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO dto) {
         UserResponseDTO response = userService.createUser(dto);
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
