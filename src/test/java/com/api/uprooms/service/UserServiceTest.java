@@ -2,6 +2,8 @@ package com.api.uprooms.service;
 
 import com.api.uprooms.dto.UserRequestDTO;
 import com.api.uprooms.dto.UserResponseDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.User;
 import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.repository.UserRepository;
@@ -56,13 +58,13 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when user email already exists")
-    void ShouldThrowIllegalArgumentException_When_User_Email_Already_Exists() {
+    @DisplayName("Should throw BusinessException when user email already exists")
+    void ShouldThrowBusinessException_When_User_Email_Already_Exists() {
         UserRequestDTO userRequestDTO = new UserRequestDTO(sampleUser.getName(), sampleUser.getEmail(), sampleUser.getPassword(), sampleUser.getRole());
 
         Mockito.when(mockUserRepository.existsByEmail(sampleUser.getEmail())).thenReturn(true);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockUserService.createUser(userRequestDTO));
+        Assertions.assertThrows(BusinessException.class, () -> mockUserService.createUser(userRequestDTO));
     }
 
     @Test
@@ -78,11 +80,11 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Illegal Argument Exception when a user is not found")
-    void Should_Return_Illegal_Argument_Exception_When_User_Not_Found() {
+    @DisplayName("Should return a ResourceNotFoundException when a user is not found")
+    void Should_Return_Resource_Not_Found_Exception_When_User_Not_Found() {
         Mockito.when(mockUserRepository.findById(sampleUser.getId())).thenReturn(java.util.Optional.empty());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockUserService.findEntityById(sampleUser.getId()));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> mockUserService.findEntityById(sampleUser.getId()));
         Mockito.verify(mockUserRepository, Mockito.times(1)).findById(sampleUser.getId());
         Mockito.verify(mockUserRepository, Mockito.never()).save(Mockito.any(User.class));
     }

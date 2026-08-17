@@ -1,6 +1,8 @@
 package com.api.uprooms.service;
 
 import com.api.uprooms.dto.RoomDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.Room;
 import com.api.uprooms.model.User;
 import com.api.uprooms.model.enums.EnumUserRole;
@@ -64,11 +66,11 @@ public class RoomServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Illegal Argument exception when a user tries to create a room which number already exists")
-    void should_return_illegal_argument_exception_when_a_user_tries_to_create_a_room_which_number_already_exists(){
+    @DisplayName("Should return a BusinessException when a user tries to create a room which number already exists")
+    void should_return_business_exception_when_a_user_tries_to_create_a_room_which_number_already_exists(){
         Mockito.when(mockRoomRepository.existsByNumber(roomDTO.number())).thenReturn(true);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.createRoom(roomDTO));
+        Assertions.assertThrows(BusinessException.class, () -> mockRoomService.createRoom(roomDTO));
         Mockito.verify(mockRoomRepository, Mockito.times(1)).existsByNumber(roomDTO.number());
     }
 
@@ -101,11 +103,11 @@ public class RoomServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Illegal Argument exception when a user tries to find a room which does not exists")
-    void should_return_illegal_argument_exception_when_a_user_tries_to_find_a_room_which_does_not_exists(){
+    @DisplayName("Should return a ResourceNotFoundException when a user tries to find a room which does not exists")
+    void should_return_resource_not_found_exception_when_a_user_tries_to_find_a_room_which_does_not_exists(){
         Mockito.when(mockRoomRepository.findById(sampleRoom.getId())).thenReturn(java.util.Optional.empty());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.findEntityById(sampleRoom.getId()));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> mockRoomService.findEntityById(sampleRoom.getId()));
         Mockito.verify(mockRoomRepository, Mockito.times(1)).findById(sampleRoom.getId());
     }
 
@@ -121,11 +123,11 @@ public class RoomServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Illegal Argument exception when a user tries to toggle a room status which does not exists")
-    void should_return_illegal_argument_exception_when_a_user_tries_to_toggle_a_room_status_which_does_not_exists(){
+    @DisplayName("Should return a ResourceNotFoundException when a user tries to toggle a room status which does not exists")
+    void should_return_resource_not_found_exception_when_a_user_tries_to_toggle_a_room_status_which_does_not_exists(){
         Mockito.when(mockRoomRepository.findById(sampleRoom.getId())).thenReturn(java.util.Optional.empty());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mockRoomService.toggleRoomStatus(sampleRoom.getId()));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> mockRoomService.toggleRoomStatus(sampleRoom.getId()));
         Mockito.verify(mockRoomRepository, Mockito.times(1)).findById(sampleRoom.getId());
     }
 

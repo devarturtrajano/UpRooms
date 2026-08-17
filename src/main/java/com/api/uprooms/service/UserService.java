@@ -2,6 +2,8 @@ package com.api.uprooms.service;
 
 import com.api.uprooms.dto.UserRequestDTO;
 import com.api.uprooms.dto.UserResponseDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.User;
 import com.api.uprooms.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +35,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("This email is already registered.");
+            throw new BusinessException("This email is already registered.");
         }
 
         User user = new User();
@@ -48,7 +50,7 @@ public class UserService implements UserDetailsService {
 
     public User findEntityById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
     }
 
     public List<UserResponseDTO> findAll() {

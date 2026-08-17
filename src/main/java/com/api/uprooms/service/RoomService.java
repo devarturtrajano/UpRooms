@@ -1,8 +1,9 @@
 package com.api.uprooms.service;
 
 import com.api.uprooms.dto.RoomDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.Room;
-import com.api.uprooms.model.enums.EnumUserRole;
 import com.api.uprooms.repository.RoomRepository;
 import com.api.uprooms.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -13,17 +14,15 @@ import java.util.List;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final UserRepository userRepository;
 
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository) {
+    public RoomService(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
-        this.userRepository = userRepository;
     }
 
     @Transactional
     public RoomDTO createRoom(RoomDTO dto) {
         if (roomRepository.existsByNumber(dto.number())) {
-            throw new IllegalArgumentException("Already exists a room with number: " + dto.number());
+            throw new BusinessException("Already exists a room with number: " + dto.number());
         }
 
         Room room = new Room();
@@ -44,7 +43,7 @@ public class RoomService {
 
     public Room findEntityById(Long id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Room not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: " + id));
     }
 
     @Transactional

@@ -2,6 +2,8 @@ package com.api.uprooms.service;
 
 import com.api.uprooms.dto.BookingRequestDTO;
 import com.api.uprooms.dto.BookingResponseDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.Booking;
 import com.api.uprooms.model.Room;
 import com.api.uprooms.model.User;
@@ -27,14 +29,14 @@ public class BookingService {
     @Transactional
     public BookingResponseDTO createBooking(BookingRequestDTO dto) {
         if (dto.startTime().isAfter(dto.endTime()) || dto.startTime().isEqual(dto.endTime())) {
-            throw new IllegalArgumentException("The start time must be before the end time.");
+            throw new BusinessException("The start time must be before the end time.");
         }
 
         User user = userService.findEntityById(dto.userId());
         Room room = roomService.findEntityById(dto.roomId());
 
         if (!room.isActive()) {
-            throw new IllegalStateException("This room is not active or in maintenance.");
+            throw new BusinessException("This room is not active or in maintenance.");
         }
 
         boolean isOverlapping = bookingRepository.existsOverlappingBooking(
@@ -45,7 +47,7 @@ public class BookingService {
         );
 
         if (isOverlapping) {
-            throw new IllegalArgumentException("This room is already booked during this time.");
+            throw new BusinessException("This room is already booked during this time.");
         }
 
         Booking booking = new Booking();
@@ -62,20 +64,16 @@ public class BookingService {
     @Transactional
     public void cancelBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found."));
 
         booking.setStatus(EnumBookingStatus.BookingStatus.CANCELED);
         bookingRepository.save(booking);
     }
 
     public List<BookingResponseDTO> findBookingsByUserId(Long userId) {
-        try {
-            return bookingRepository.findByUserIdFetchAll(userId)
-                    .stream()
-                    .map(BookingResponseDTO::new)
-                    .toList();
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("User not found with ID: " + userId);
-        }
+        return bookingRepository.findByUserIdFetchAll(userId)
+                .stream()
+                .map(BookingResponseDTO::new)
+                .toList();
     }
 }

@@ -2,6 +2,8 @@ package com.api.uprooms.service;
 
 import com.api.uprooms.dto.BookingRequestDTO;
 import com.api.uprooms.dto.BookingResponseDTO;
+import com.api.uprooms.exceptions.BusinessException;
+import com.api.uprooms.exceptions.ResourceNotFoundException;
 import com.api.uprooms.model.Booking;
 import com.api.uprooms.model.Room;
 import com.api.uprooms.model.User;
@@ -87,7 +89,7 @@ class BookingServiceTest {
                 eq(2L), eq(start), eq(end), eq(EnumBookingStatus.BookingStatus.CONFIRMED)
         )).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
             bookingService.createBooking(requestDto);
         });
 
@@ -95,8 +97,8 @@ class BookingServiceTest {
         Mockito.verify(bookingRepository, Mockito.never()).save(any());
     }
     @Test
-    @DisplayName("Should throw IllegalStateException when a booking is made for an inactive room")
-    void createBooking_withInactiveRoom_ThrowsIllegalStateException(){
+    @DisplayName("Should throw BusinessException when a booking is made for an inactive room")
+    void createBooking_withInactiveRoom_ThrowsBusinessException(){
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(14).withMinute(0);
         LocalDateTime end = start.plusHours(2);
         BookingRequestDTO requestDto = new BookingRequestDTO(1L, 3L, start, end);
@@ -104,7 +106,7 @@ class BookingServiceTest {
         Mockito.when(userService.findEntityById(1L)).thenReturn(sampleUser);
         Mockito.when(roomService.findEntityById(3L)).thenReturn(sampleRoomInactive);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
             bookingService.createBooking(requestDto);
         });
 
@@ -135,14 +137,14 @@ class BookingServiceTest {
         Mockito.verify(bookingRepository, Mockito.times(1)).save(booking);
     }
     @Test
-    @DisplayName("Should throw IllegalArgumentException when attempting to cancel a non-existent booking")
-    void cancelBooking_WithInvalidId_ThrowsIllegalArgumentException() {
+    @DisplayName("Should throw ResourceNotFoundException when attempting to cancel a non-existent booking")
+    void cancelBooking_WithInvalidId_ThrowsResourceNotFoundException() {
         // Arrange
         Long invalidBookingId = 99L;
         Mockito.when(bookingRepository.findById(invalidBookingId)).thenReturn(java.util.Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             bookingService.cancelBooking(invalidBookingId);
         });
 
