@@ -23,7 +23,7 @@ public class RoomController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> createRoom(@Valid @RequestBody RoomDTO dto) {
+    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody RoomDTO dto) {
         RoomDTO response = roomService.createRoom(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -40,7 +40,7 @@ public class RoomController {
     }
 
     @PatchMapping("{id}/toggle-status")
-    public ResponseEntity<Object> toggleRoomStatus(@PathVariable Long id) {
+    public ResponseEntity<RoomDTO> toggleRoomStatus(@PathVariable Long id) {
         roomService.toggleRoomStatus(id);
         return ResponseEntity.noContent().build();
     }
