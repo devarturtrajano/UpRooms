@@ -9,7 +9,6 @@ public class UproomsApplication {
 
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.configure()
-				.filename("data.env")
 				.ignoreIfMissing()
 				.load();
 
