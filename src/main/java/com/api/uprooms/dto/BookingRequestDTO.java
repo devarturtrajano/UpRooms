@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record BookingRequestDTO(
-        @NotNull(message = "O ID do usuário é obrigatório.")
+        @NotNull(message = "The user Id can not be null.")
         Long userId,
 
-        @NotNull(message = "O ID da sala é obrigatório.")
+        @NotNull(message = "The room Id can not be null.")
         Long roomId,
 
-        @NotNull(message = "A data de início é obrigatória.")
-        @FutureOrPresent(message = "A reserva não pode começar no passado.")
+        @NotNull(message = "The start date can not be null.")
+        @FutureOrPresent(message = "The booking can not start on the past.")
         LocalDateTime startTime,
 
-        @NotNull(message = "A data de fim é obrigatória.")
+        @NotNull(message = "The ending date can not be null.")
         LocalDateTime endTime
 ) {}

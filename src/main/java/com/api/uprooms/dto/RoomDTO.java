@@ -7,11 +7,11 @@ import jakarta.validation.constraints.NotNull;
 public record RoomDTO(
         Long id,
 
-        @NotNull(message = "O número da sala é obrigatório.")
+        @NotNull(message = "The room number can not be null.")
         Integer number,
 
-        @NotNull(message = "A capacidade é obrigatória.")
-        @Min(value = 1, message = "A capacidade deve ser de pelo menos 1 pessoa.")
+        @NotNull(message = "The room capacity can not be null.")
+        @Min(value = 1, message = "The room capacity must be greater than 1.")
         Integer capacity,
 
         boolean isActive

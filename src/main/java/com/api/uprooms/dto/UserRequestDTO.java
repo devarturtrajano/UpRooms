@@ -7,17 +7,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO(
-        @NotBlank(message = "O nome é obrigatório.")
+        @NotBlank(message = "The user name can not be blank.")
         String name,
 
-        @NotBlank(message = "O e-mail é obrigatório.")
-        @Email(message = "Insira um e-mail válido.")
+        @NotBlank(message = "The user email can not be blank.")
+        @Email(message = "Insert a valid email.")
         String email,
 
-        @NotBlank(message = "A senha é obrigatória.")
-        @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
+        @NotBlank(message = "The password can not be blank.")
+        @Size(min = 6, message = "The password must have at least 6 characters.")
         String password,
 
-        @NotNull(message = "O perfil (role) é obrigatório.")
+        @NotNull(message = "The user role can not be null.")
         EnumUserRole.UserRole role
 ) {}

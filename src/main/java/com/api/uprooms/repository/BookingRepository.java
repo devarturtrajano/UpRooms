@@ -22,8 +22,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("endTime") LocalDateTime endTime,
             @Param("status") EnumBookingStatus.BookingStatus status
     );
-
-    // Recupera a nossa consulta de alta performance unindo as entidades necessárias numa única operação
     @Query("SELECT b FROM Booking b " +
             "JOIN FETCH b.user " +
             "JOIN FETCH b.room " +
